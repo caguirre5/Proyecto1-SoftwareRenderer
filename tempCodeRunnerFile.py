@@ -1,0 +1,1 @@
+rend.glLookAt(modelPosition, V3(0, 10, 0))
