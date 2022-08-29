@@ -1,4 +1,4 @@
-import numpy as np
+import glMath
 
 
 def flat(render, **kwargs):
@@ -23,8 +23,7 @@ def flat(render, **kwargs):
         g *= texColor[1]
         r *= texColor[0]
 
-    dirLight = np.array(render.dirLight)
-    intensity = np.dot(triangleNormal, -dirLight)
+    intensity = glMath.Dot(triangleNormal, render.dirLight)
 
     b *= intensity
     g *= intensity
@@ -58,12 +57,11 @@ def gourad(render, **kwargs):
         g *= texColor[1]
         r *= texColor[0]
 
-    triangleNormal = np.array([nA[0] * u + nB[0] * v + nC[0] * w,
-                               nA[1] * u + nB[1] * v + nC[1] * w,
-                               nA[2] * u + nB[2] * v + nC[2] * w])
+    triangleNormal = [nA[0] * u + nB[0] * v + nC[0] * w,
+                      nA[1] * u + nB[1] * v + nC[1] * w,
+                      nA[2] * u + nB[2] * v + nC[2] * w]
 
-    dirLight = np.array(render.dirLight)
-    intensity = np.dot(triangleNormal, -dirLight)
+    intensity = glMath.Dot(triangleNormal, render.dirLight)
 
     b *= intensity
     g *= intensity
@@ -73,29 +71,6 @@ def gourad(render, **kwargs):
         return r, g, b
     else:
         return 0, 0, 0
-
-
-def unlit(render, **kwargs):
-    u, v, w = kwargs["baryCoords"]
-    b, g, r = kwargs["vColor"]
-    tA, tB, tC = kwargs["texCoords"]
-
-    b /= 255
-    g /= 255
-    r /= 255
-
-    if render.active_texture:
-        # P = Au + Bv + Cw
-        tU = tA[0] * u + tB[0] * v + tC[0] * w
-        tV = tA[1] * u + tB[1] * v + tC[1] * w
-
-        texColor = render.active_texture.getColor(tU, tV)
-
-        b *= texColor[2]
-        g *= texColor[1]
-        r *= texColor[0]
-
-    return r, g, b
 
 
 def toon(render, **kwargs):
@@ -120,12 +95,11 @@ def toon(render, **kwargs):
         g *= texColor[1]
         r *= texColor[0]
 
-    triangleNormal = np.array([nA[0] * u + nB[0] * v + nC[0] * w,
-                               nA[1] * u + nB[1] * v + nC[1] * w,
-                               nA[2] * u + nB[2] * v + nC[2] * w])
+    triangleNormal = [nA[0] * u + nB[0] * v + nC[0] * w,
+                      nA[1] * u + nB[1] * v + nC[1] * w,
+                      nA[2] * u + nB[2] * v + nC[2] * w]
 
-    dirLight = np.array(render.dirLight)
-    intensity = np.dot(triangleNormal, -dirLight)
+    intensity = glMath.Dot(triangleNormal, render.dirLight)
 
     if intensity < 0.2:
         intensity = 0.1
@@ -168,12 +142,11 @@ def glow(render, **kwargs):
         g *= texColor[1]
         r *= texColor[0]
 
-    triangleNormal = np.array([nA[0] * u + nB[0] * v + nC[0] * w,
-                               nA[1] * u + nB[1] * v + nC[1] * w,
-                               nA[2] * u + nB[2] * v + nC[2] * w])
+    triangleNormal = [nA[0] * u + nB[0] * v + nC[0] * w,
+                      nA[1] * u + nB[1] * v + nC[1] * w,
+                      nA[2] * u + nB[2] * v + nC[2] * w]
 
-    dirLight = np.array(render.dirLight)
-    intensity = np.dot(triangleNormal, -dirLight)
+    intensity = glMath.Dot(triangleNormal, render.dirLight)
 
     b *= intensity
     g *= intensity
@@ -183,7 +156,7 @@ def glow(render, **kwargs):
                   render.camMatrix.item(1, 2),
                   render.camMatrix.item(2, 2))
 
-    glowAmount = 1 - np.dot(triangleNormal, camForward)
+    glowAmount = 1 - glMath.Dot(triangleNormal, camForward)
 
     if glowAmount <= 0:
         glowAmount = 0
@@ -229,12 +202,11 @@ def textureBlend(render, **kwargs):
         g *= texColor[1]
         r *= texColor[0]
 
-    triangleNormal = np.array([nA[0] * u + nB[0] * v + nC[0] * w,
-                               nA[1] * u + nB[1] * v + nC[1] * w,
-                               nA[2] * u + nB[2] * v + nC[2] * w])
+    triangleNormal = [nA[0] * u + nB[0] * v + nC[0] * w,
+                      nA[1] * u + nB[1] * v + nC[1] * w,
+                      nA[2] * u + nB[2] * v + nC[2] * w]
 
-    dirLight = np.array(render.dirLight)
-    intensity = np.dot(triangleNormal, -dirLight)
+    intensity = glMath.Dot(triangleNormal, render.dirLight)
 
     b *= intensity
     g *= intensity
@@ -267,47 +239,6 @@ def textureBlend(render, **kwargs):
     return r, g, b
 
 
-def fondomarino(render, **kwargs):
-    # Normal calculada por vertice
-    u, v, w = kwargs["baryCoords"]
-    b, g, r = kwargs["vColor"]
-    tA, tB, tC = kwargs["texCoords"]
-    nA, nB, nC = kwargs["normals"]
-
-    b /= 255
-    g /= 255
-    r /= 255
-
-    if render.active_texture:
-        # P = Au + Bv + Cw
-        tU = tA[0] * u + tB[0] * v + tC[0] * w
-        tV = tA[1] * u + tB[1] * v + tC[1] * w
-
-        texColor = render.active_texture.getColor(tU, tV)
-
-        b *= texColor[2]
-        g *= texColor[1]
-        r *= texColor[0]
-
-    triangleNormal = np.array([nA[0] * u + nB[0] * v + nC[0] * w,
-                               nA[1] * u + nB[1] * v + nC[1] * w,
-                               nA[2] * u + nB[2] * v + nC[2] * w])
-
-    dirLight = np.array(render.dirLight)
-    intensity = np.dot(triangleNormal, -dirLight)
-
-    yellow = (1, 1, 0)
-
-    b *= (intensity/intensity)*yellow[0]
-    g *= intensity/yellow[1]
-    r *= (intensity)*yellow[2]
-
-    if intensity > 0:
-        return r, g, b
-    else:
-        return 0, 0, 1
-
-
 def textureBlend2(render, **kwargs):
     # Normal calculada por vertice
     u, v, w = kwargs["baryCoords"]
@@ -330,12 +261,11 @@ def textureBlend2(render, **kwargs):
         g *= texColor[1]
         r *= texColor[0]
 
-    triangleNormal = np.array([nA[0] * u + nB[0] * v + nC[0] * w,
-                               nA[1] * u + nB[1] * v + nC[1] * w,
-                               nA[2] * u + nB[2] * v + nC[2] * w])
+    triangleNormal = [nA[0] * u + nB[0] * v + nC[0] * w,
+                      nA[1] * u + nB[1] * v + nC[1] * w,
+                      nA[2] * u + nB[2] * v + nC[2] * w]
 
-    dirLight = np.array(render.dirLight)
-    intensity = np.dot(triangleNormal, -dirLight)
+    intensity = glMath.Dot(triangleNormal, render.dirLight)
 
     b *= intensity
     g *= intensity
@@ -379,12 +309,11 @@ def popshader(render, **kwargs):
     g /= 255
     r /= 255
 
-    triangleNormal = np.array([nA[0] * u + nB[0] * v + nC[0] * w,
-                               nA[1] * u + nB[1] * v + nC[1] * w,
-                               nA[2] * u + nB[2] * v + nC[2] * w])
+    triangleNormal = [nA[0] * u + nB[0] * v + nC[0] * w,
+                      nA[1] * u + nB[1] * v + nC[1] * w,
+                      nA[2] * u + nB[2] * v + nC[2] * w]
 
-    dirLight = np.array(render.dirLight)
-    intensity = np.dot(triangleNormal, -dirLight)
+    intensity = glMath.Dot(triangleNormal, render.dirLight)
 
     if intensity < 0.2:
         b = 0
@@ -407,3 +336,72 @@ def popshader(render, **kwargs):
         return r, g, b
     else:
         return 1, 0, 1
+
+
+def roseluminescent(render, **kwargs):
+    u, v, w = kwargs["baryCoords"]
+    b, g, r = kwargs["vColor"]
+    tA, tB, tC = kwargs["texCoords"]
+
+    b /= 255
+    g /= 255
+    r /= 255
+
+    if render.active_texture:
+        # P = Au + Bv + Cw
+        tU = tA[0] * u + tB[0] * v + tC[0] * w
+        tV = tA[1] * u + tB[1] * v + tC[1] * w
+
+        texColor = render.active_texture.getColor(tU, tV)
+
+        b *= 1
+        g *= texColor[1]
+        r *= 1
+
+    return r, g, b
+
+
+def blueluminescent(render, **kwargs):
+    u, v, w = kwargs["baryCoords"]
+    b, g, r = kwargs["vColor"]
+    tA, tB, tC = kwargs["texCoords"]
+
+    b /= 255
+    g /= 255
+    r /= 255
+
+    if render.active_texture:
+        # P = Au + Bv + Cw
+        tU = tA[0] * u + tB[0] * v + tC[0] * w
+        tV = tA[1] * u + tB[1] * v + tC[1] * w
+
+        texColor = render.active_texture.getColor(tU, tV)
+
+        b *= 1
+        g *= 1
+        r *= texColor[0]
+
+    return r, g, b
+
+
+def goldluminescent(render, **kwargs):
+    u, v, w = kwargs["baryCoords"]
+    b, g, r = kwargs["vColor"]
+    tA, tB, tC = kwargs["texCoords"]
+
+    b /= 255
+    g /= 255
+    r /= 255
+
+    if render.active_texture:
+        # P = Au + Bv + Cw
+        tU = tA[0] * u + tB[0] * v + tC[0] * w
+        tV = tA[1] * u + tB[1] * v + tC[1] * w
+
+        texColor = render.active_texture.getColor(tU, tV)
+
+        b *= texColor[0]
+        g *= glMath.HEX(180)
+        r *= glMath.HEX(180)
+
+    return r, g, b

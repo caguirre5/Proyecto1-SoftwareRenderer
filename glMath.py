@@ -65,3 +65,8 @@ def Dot(A, B):
     for i in range(len(A)):
         R += A[i]*-B[i]
     return R
+
+
+def HEX(color):
+    cr = color/255
+    return cr
