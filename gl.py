@@ -66,6 +66,10 @@ class Renderer(object):
         self.active_texture = None
         self.active_texture2 = None
 
+        self.normal_map = None
+
+        self.background = None
+
         self.dirLight = V3(0, 0, -1)
 
         self.glViewMatrix()
@@ -106,6 +110,20 @@ class Renderer(object):
                                     [0, 0, 0, 1]])
 
         self.viewMatrix = np.linalg.inv(self.camMatrix)
+
+    def glClearBackground(self):
+        if self.background:
+            for x in range(self.vpX, self.vpX + self.vpWidth + 1):
+                for y in range(self.vpY, self.vpY + self.vpHeight + 1):
+
+                    tU = (x - self.vpX) / self.vpWidth
+                    tV = (y - self.vpY) / self.vpHeight
+
+                    texColor = self.background.getColor(tU, tV)
+
+                    if texColor:
+                        self.glPoint(x, y, color(
+                            texColor[0], texColor[1], texColor[2]))
 
     def glProjectionMatrix(self, n=0.1, f=1000, fov=60):
         aspectRatio = self.vpWidth / self.vpHeight
@@ -390,13 +408,27 @@ class Renderer(object):
         maxX = round(max(A.x, B.x, C.x))
         maxY = round(max(A.y, B.y, C.y))
 
-        triangleNormal = glMath.Cross(
-            glMath.Substract(B, A), glMath.Substract(C, A))
-        # normalizar
-        triangleNormal = glMath.Normalize(triangleNormal)
+        edge1 = np.subtract(verts[1], verts[0])
+        edge2 = np.subtract(verts[2], verts[0])
+
+        triangleNormal = np.cross(edge1, edge2)
+        triangleNormal = triangleNormal / np.linalg.norm(triangleNormal)
+
+        deltaUV1 = np.subtract(texCoords[1], texCoords[0])
+        deltaUV2 = np.subtract(texCoords[2], texCoords[0])
+        f = 1 / (deltaUV1[0] * deltaUV2[1] - deltaUV2[0] * deltaUV1[1])
+
+        tangent = [f * (deltaUV2[1] * edge1[0] - deltaUV1[1] * edge2[0]),
+                   f * (deltaUV2[1] * edge1[1] - deltaUV1[1] * edge2[1]),
+                   f * (deltaUV2[1] * edge1[2] - deltaUV1[1] * edge2[2])]
+        tangent = tangent / np.linalg.norm(tangent)
+
+        bitangent = np.cross(triangleNormal, tangent)
+        bitangent = bitangent / np.linalg.norm(bitangent)
 
         for x in range(minX, maxX + 1):
             for y in range(minY, maxY + 1):
+
                 u, v, w = baryCoords(A, B, C, V2(x, y))
 
                 if 0 <= u and 0 <= v and 0 <= w:
@@ -414,7 +446,9 @@ class Renderer(object):
                                                              vColor=clr or self.currColor,
                                                              texCoords=texCoords,
                                                              normals=normals,
-                                                             triangleNormal=triangleNormal)
+                                                             triangleNormal=triangleNormal,
+                                                             tangent=tangent,
+                                                             bitangent=bitangent)
 
                                 self.glPoint(x, y, color(r, g, b))
                             else:

@@ -2,7 +2,7 @@ from pickle import GLOBAL
 from gl import Renderer, color, V3, V2
 import glMath as gm
 from texture import Texture
-from shaders import flat, popshader, gourad, toon, glow, roseluminescent, blueluminescent, goldluminescent
+from shaders import flat, normalMap, popshader, gourad, normalMap, toon, glow, roseluminescent, blueluminescent, goldluminescent
 
 width = 1080
 height = 720
@@ -12,8 +12,8 @@ rend = Renderer(width, height)
 rend.dirLight = V3(0, 1, 0)
 
 
-rend.glClearColor(gm.HEX(18), gm.HEX(87), gm.HEX(115))
-rend.glClear()
+rend.background = Texture("models/oceanbg.bmp")
+rend.glClearBackground()
 
 modelPosition = V3(0.8, -1.5, -4)
 
@@ -38,7 +38,7 @@ rend.glLoadModel("models/tiburon.obj",
                  rotate=V3(10, 45, 0))
 
 #----------------------PECES------------------------#
-rend.active_shader = popshader
+rend.active_shader = gourad
 rend.active_texture = Texture("models/pez.bmp")
 rend.glLoadModel("models/pez.obj",
                  translate=V3(4.2, 3.2, -8),
@@ -62,14 +62,24 @@ rend.glLoadModel("models/pez.obj",
                  rotate=V3(0, 45, 0))
 
 #----------------------MANTARRAYA------------------------#
-rend.dirLight = V3(1, 0, 0)
+rend.dirLight = V3(0, 0, -1)
 rend.active_shader = gourad
-rend.active_texture = Texture("models/SharkTexture.bmp")
-rend.glLoadModel("models/pez.obj",
+rend.active_texture = Texture("models/Fish_tex.bmp")
+rend.glLoadModel("models/PezDorado.obj",
                  #  translate=V3(0.8, 0, -4),
-                 translate=V3(0, -0.85, -2.3),
-                 scale=V3(1, 1, 1),
-                 rotate=V3(0, -90, 0))
+                 translate=V3(0, -0.5, -1.8),
+                 scale=V3(0.01, 0.01, 0.01),
+                 rotate=V3(0, -160, 0))
+rend.glLoadModel("models/PezDorado.obj",
+                 #  translate=V3(0.8, 0, -4),
+                 translate=V3(-0.6, -0.6, -2.2),
+                 scale=V3(0.01, 0.01, 0.01),
+                 rotate=V3(0, 160, -35))
+rend.glLoadModel("models/PezDorado.obj",
+                 #  translate=V3(0.8, 0, -4),
+                 translate=V3(0.5, -0.5, -2.5),
+                 scale=V3(0.01, 0.01, 0.01),
+                 rotate=V3(0, -160, 0))
 
 #----------------------DELFIN------------------------#
 rend.active_shader = gourad
@@ -80,14 +90,25 @@ rend.glLoadModel("models/delfin.obj",
                  scale=V3(0.1, 0.1, 0.1),
                  rotate=V3(20, 5, 0))
 
+#----------------------STONE------------------------#
+# rend.active_shader = textureBlend
+
+# rend.active_texture = Texture("models/norm.bmp")
+# rend.dirLight = V3(1, 0, 0)
+# rend.glLoadModel("models/Stone_O.obj",
+#                  translate=V3(0.2, -0.5, -0.8),
+#                  scale=V3(1, 1, 1),
+#                  rotate=V3(0, 0, 0))
+
 #----------------------FONDO MARINO------------------------#
-rend.active_shader = gourad
 rend.dirLight = V3(0.5, -0.5, 0)
-rend.active_texture = Texture("models/arena.bmp")
+rend.normal_map = Texture("models/SandStoneNormal.bmp")
+rend.active_texture = Texture("models/SandStone.bmp")
+rend.active_shader = normalMap
 rend.glLoadModel("models/fondomarino.obj",
                  translate=V3(-4.5, -2.5, -4),
                  scale=V3(2, 1, 1),
-                 rotate=V3(2, 0, 0))
+                 rotate=V3(1, 0, 0))
 
 #----------------------CORALES------------------------#
 rend.active_texture = Texture("models/CoralTexture1.bmp")
@@ -114,5 +135,18 @@ rend.glLoadModel("models/coral3.obj",
                  translate=V3(-0.15, -1, -1.2),
                  scale=V3(1, 1, 1),
                  rotate=V3(0, 180, 0))
+rend.active_texture = Texture("models/CoralTexture1.bmp")
+rend.active_shader = roseluminescent
+rend.dirLight = V3(1, 0, 0)
+rend.glLoadModel("models/coral1.obj",
+                 translate=V3(0.5, -1.5, -2),
+                 scale=V3(1.2, 1.2, 1.2),
+                 rotate=V3(0, 0, 0))
+rend.active_shader = blueluminescent
+rend.active_texture = Texture("models/coral2Texture.bmp")
+rend.glLoadModel("models/coral2.obj",
+                 translate=V3(-0.5, -1.2, -1.8),
+                 scale=V3(1, 1, 1),
+                 rotate=V3(0, 0, 0))
 
 rend.glFinish("output.bmp")
