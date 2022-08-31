@@ -279,7 +279,6 @@ def popshader(render, **kwargs):
     else:
         return 1, 0, 1
 
-
 def roseluminescent(render, **kwargs):
     u, v, w = kwargs["baryCoords"]
     b, g, r = kwargs["vColor"]
@@ -296,9 +295,31 @@ def roseluminescent(render, **kwargs):
 
         texColor = render.active_texture.getColor(tU, tV)
 
-        b *= 1
-        g *= texColor[1]
-        r *= 1
+        b *= texColor[0]
+        g *= texColor[1]/3
+        r *= texColor[2]
+
+    return r, g, b
+
+def orangeluminescent(render, **kwargs):
+    u, v, w = kwargs["baryCoords"]
+    b, g, r = kwargs["vColor"]
+    tA, tB, tC = kwargs["texCoords"]
+
+    b /= 255
+    g /= 255
+    r /= 255
+
+    if render.active_texture:
+        # P = Au + Bv + Cw
+        tU = tA[0] * u + tB[0] * v + tC[0] * w
+        tV = tA[1] * u + tB[1] * v + tC[1] * w
+
+        texColor = render.active_texture.getColor(tU, tV)
+
+        b *= 0
+        g *= texColor[1]/2
+        r *= texColor[2]
 
     return r, g, b
 

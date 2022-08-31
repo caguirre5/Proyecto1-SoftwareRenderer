@@ -2,7 +2,7 @@ from pickle import GLOBAL
 from gl import Renderer, color, V3, V2
 import glMath as gm
 from texture import Texture
-from shaders import flat, normalMap, popshader, gourad, normalMap, toon, glow, roseluminescent, blueluminescent, goldluminescent
+from shaders import flat, normalMap, popshader,orangeluminescent, gourad, normalMap, toon, glow, roseluminescent, blueluminescent, goldluminescent
 
 width = 1080
 height = 720
@@ -112,7 +112,7 @@ rend.glLoadModel("models/fondomarino.obj",
 
 #----------------------CORALES------------------------#
 rend.active_texture = Texture("models/CoralTexture1.bmp")
-rend.active_shader = roseluminescent
+rend.active_shader = orangeluminescent
 rend.dirLight = V3(1, 0, 0)
 rend.glLoadModel("models/coral1.obj",
                  translate=V3(-1, -1, -1.5),
