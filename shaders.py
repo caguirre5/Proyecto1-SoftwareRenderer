@@ -1,5 +1,4 @@
 import glMath
-import numpy as np
 
 
 def flat(render, **kwargs):
@@ -279,6 +278,7 @@ def popshader(render, **kwargs):
     else:
         return 1, 0, 1
 
+
 def roseluminescent(render, **kwargs):
     u, v, w = kwargs["baryCoords"]
     b, g, r = kwargs["vColor"]
@@ -300,6 +300,7 @@ def roseluminescent(render, **kwargs):
         r *= texColor[2]
 
     return r, g, b
+
 
 def orangeluminescent(render, **kwargs):
     u, v, w = kwargs["baryCoords"]
@@ -432,30 +433,29 @@ def normalMap(render, **kwargs):
         g *= texColor[1]
         r *= texColor[0]
 
-    triangleNormal = np.array([nA[0] * u + nB[0] * v + nC[0] * w,
-                               nA[1] * u + nB[1] * v + nC[1] * w,
-                               nA[2] * u + nB[2] * v + nC[2] * w])
+    triangleNormal = [nA[0] * u + nB[0] * v + nC[0] * w,
+                      nA[1] * u + nB[1] * v + nC[1] * w,
+                      nA[2] * u + nB[2] * v + nC[2] * w]
 
-    dirLight = np.array(render.dirLight)
+    dirLight = (-render.dirLight[0], -render.dirLight[1], -render.dirLight[2])
 
     if render.normal_map:
         texNormal = render.normal_map.getColor(tU, tV)
         texNormal = [texNormal[0] * 2 - 1,
                      texNormal[1] * 2 - 1,
                      texNormal[2] * 2 - 1]
-        texNormal = texNormal / np.linalg.norm(texNormal)
+        texNormal = glMath.Normalize(texNormal)
 
-        tangentMatrix = np.matrix([[tangent[0], bitangent[0], triangleNormal[0]],
-                                   [tangent[1], bitangent[1], triangleNormal[1]],
-                                   [tangent[2], bitangent[2], triangleNormal[2]]])
+        tangentMatrix = [[tangent[0], bitangent[0], triangleNormal[0]],
+                         [tangent[1], bitangent[1], triangleNormal[1]],
+                         [tangent[2], bitangent[2], triangleNormal[2]]]
 
-        texNormal = tangentMatrix @ texNormal
-        texNormal = texNormal.tolist()[0]
-        texNormal = texNormal / np.linalg.norm(texNormal)
+        texNormal = glMath.MV(tangentMatrix, texNormal)
+        texNormal = glMath.Normalize(texNormal)
 
-        intensity = np.dot(texNormal, -dirLight)
+        intensity = glMath.Dot(texNormal, dirLight)
     else:
-        intensity = np.dot(triangleNormal, -dirLight)
+        intensity = glMath.Dot(triangleNormal, dirLight)
 
     b *= intensity
     g *= intensity

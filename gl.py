@@ -92,24 +92,7 @@ class Renderer(object):
 
     def glViewMatrix(self, translate=V3(0, 0, 0), rotate=V3(0, 0, 0)):
         self.camMatrix = self.glCreateObjectMatrix(translate, rotate)
-        self.viewMatrix = np.linalg.inv(self.camMatrix)
-
-    def glLookAt(self, eye, camPosition=V3(0, 0, 0)):
-        forward = np.subtract(camPosition, eye)
-        forward = forward / np.linalg.norm(forward)
-
-        right = np.cross(V3(0, 1, 0), forward)
-        right = right / np.linalg.norm(right)
-
-        up = np.cross(forward, right)
-        up = up / np.linalg.norm(up)
-
-        self.camMatrix = np.matrix([[right[0], up[0], forward[0], camPosition[0]],
-                                    [right[1], up[1], forward[1], camPosition[1]],
-                                    [right[2], up[2], forward[2], camPosition[2]],
-                                    [0, 0, 0, 1]])
-
-        self.viewMatrix = np.linalg.inv(self.camMatrix)
+        self.viewMatrix = glMath.inv(self.camMatrix)
 
     def glClearBackground(self):
         if self.background:
@@ -130,11 +113,11 @@ class Renderer(object):
         t = tan((fov * pi / 180) / 2) * n
         r = t * aspectRatio
 
-        self.projectionMatrix = np.matrix([[n/r, 0, 0, 0],
-                                           [0, n/t, 0, 0],
-                                           [0, 0, -(f+n)/(f-n), -
-                                            (2*f*n)/(f-n)],
-                                           [0, 0, -1, 0]])
+        self.projectionMatrix = [[n/r, 0, 0, 0],
+                                 [0, n/t, 0, 0],
+                                 [0, 0, -(f+n)/(f-n), -
+                                  (2*f*n)/(f-n)],
+                                 [0, 0, -1, 0]]
 
     def glClearColor(self, r, g, b):
         self.clearColor = color(r, g, b)
@@ -231,8 +214,9 @@ class Renderer(object):
 
     def glCamTransform(self, vertex):
         v = V4(vertex[0], vertex[1], vertex[2], 1)
-        vt = self.viewportMatrix @ self.projectionMatrix @ self.viewMatrix @ v
-        vt = vt.tolist()[0]
+        vt = glMath.MultiplyMatrix(self.viewportMatrix, self.projectionMatrix)
+        vt = glMath.MultiplyMatrix(vt, self.viewMatrix)
+        vt = glMath.MV(vt, v)
         vf = V3(vt[0] / vt[3],
                 vt[1] / vt[3],
                 vt[2] / vt[3])
@@ -411,8 +395,8 @@ class Renderer(object):
         edge1 = np.subtract(verts[1], verts[0])
         edge2 = np.subtract(verts[2], verts[0])
 
-        triangleNormal = np.cross(edge1, edge2)
-        triangleNormal = triangleNormal / np.linalg.norm(triangleNormal)
+        triangleNormal = glMath.Cross(edge1, edge2)
+        triangleNormal = glMath.Normalize(triangleNormal)
 
         deltaUV1 = np.subtract(texCoords[1], texCoords[0])
         deltaUV2 = np.subtract(texCoords[2], texCoords[0])
@@ -421,10 +405,10 @@ class Renderer(object):
         tangent = [f * (deltaUV2[1] * edge1[0] - deltaUV1[1] * edge2[0]),
                    f * (deltaUV2[1] * edge1[1] - deltaUV1[1] * edge2[1]),
                    f * (deltaUV2[1] * edge1[2] - deltaUV1[1] * edge2[2])]
-        tangent = tangent / np.linalg.norm(tangent)
+        tangent = glMath.Normalize(tangent)
 
-        bitangent = np.cross(triangleNormal, tangent)
-        bitangent = bitangent / np.linalg.norm(bitangent)
+        bitangent = glMath.Cross(triangleNormal, tangent)
+        bitangent = glMath.Normalize(bitangent)
 
         for x in range(minX, maxX + 1):
             for y in range(minY, maxY + 1):

@@ -38,17 +38,14 @@ def MV(M, V):
 
 
 def Cross(A, B):
-    R = []
-    R.append(A[1]*B[2] - A[2]*B[1])
-    R.append(A[2]*B[0] - A[0]*B[2])
-    R.append(A[0]*B[1] - A[1]*B[0])
+    R = [A[1]*B[2] - A[2]*B[1],
+         A[2]*B[0] - A[0]*B[2],
+         A[0]*B[1] - A[1]*B[0]]
     return R
 
 
 def Substract(A, B):
-    R = []
-    for i in range(len(A)):
-        R.append(A[i] - B[i])
+    R = [A[i] - B[i] for i in range(min(len(A), len(B)))]
     return R
 
 
@@ -70,3 +67,45 @@ def Dot(A, B):
 def HEX(color):
     cr = color/255
     return cr
+
+# Get the transpose matrix
+
+
+def transpose(m):
+    return list(map(list, zip(*m)))
+
+
+def MMinor(m, i, j):
+    return [row[:j] + row[j+1:] for row in (m[:i]+m[i+1:])]
+
+# Fin the determinant of the matrix
+
+
+def getdeterminant(m):
+    # Use in 2 x 2 matrix
+    if len(m) == 2:
+        return m[0][0]*m[1][1]-m[0][1]*m[1][0]
+
+    determinant = 0
+    for c in range(len(m)):
+        determinant += ((-1)**c)*m[0][c]*getdeterminant(MMinor(m, 0, c))
+    return determinant
+
+# find matrix of cofactors
+
+
+def inv(m):
+    cofactors = []
+    determinant = getdeterminant(m)
+
+    for r in range(len(m)):
+        cofactorRow = []
+        for c in range(len(m)):
+            minor = MMinor(m, r, c)
+            cofactorRow.append(((-1)**(r+c)) * getdeterminant(minor))
+        cofactors.append(cofactorRow)
+    cofactors = transpose(cofactors)
+    for r in range(len(cofactors)):
+        for c in range(len(cofactors)):
+            cofactors[r][c] = cofactors[r][c]/determinant
+    return cofactors

@@ -1,5 +1,5 @@
-
 import struct
+
 
 class Texture(object):
     def __init__(self, filename):
@@ -23,7 +23,7 @@ class Texture(object):
                     b = ord(image.read(1)) / 255
                     g = ord(image.read(1)) / 255
                     r = ord(image.read(1)) / 255
-                    pixelRow.append([r,g,b])
+                    pixelRow.append([r, g, b])
 
                 self.pixels.append(pixelRow)
 
@@ -32,11 +32,3 @@ class Texture(object):
             return self.pixels[int(v * self.height)][int(u * self.width)]
         else:
             return None
-
-
-
-
-
-
-
-
