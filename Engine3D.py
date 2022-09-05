@@ -2,7 +2,7 @@ from pickle import GLOBAL
 from gl import Renderer, color, V3, V2
 import glMath as gm
 from texture import Texture
-from shaders import flat, normalMap, popshader,orangeluminescent, gourad, normalMap, toon, glow, roseluminescent, blueluminescent, goldluminescent
+from shaders import bluemarineshadow, normalMap, orangeluminescent, gourad, normalMap, roseluminescent, blueluminescent, goldluminescent
 
 width = 1080
 height = 720
@@ -19,7 +19,7 @@ modelPosition = V3(0.8, -1.5, -4)
 
 #----------------------BALLENAS------------------------#
 rend.active_texture = Texture("models/BallenaTexture.bmp")
-rend.active_shader = gourad
+rend.active_shader = bluemarineshadow
 rend.dirLight = V3(0, 1, 0)
 rend.glLoadModel("models/ballena.obj",
                  translate=V3(-1.9, 1, -6.5),
@@ -38,7 +38,7 @@ rend.glLoadModel("models/tiburon.obj",
                  rotate=V3(10, 45, 0))
 
 #----------------------PECES------------------------#
-rend.active_shader = gourad
+rend.active_shader = bluemarineshadow
 rend.active_texture = Texture("models/pez.bmp")
 rend.glLoadModel("models/pez.obj",
                  translate=V3(4.2, 3.2, -8),
@@ -82,7 +82,7 @@ rend.glLoadModel("models/PezDorado.obj",
                  rotate=V3(0, -160, 0))
 
 #----------------------DELFIN------------------------#
-rend.active_shader = gourad
+rend.active_shader = bluemarineshadow
 rend.active_texture = Texture("models/DelfnTexture.bmp")
 rend.dirLight = V3(1, 0, 0)
 rend.glLoadModel("models/delfin.obj",
@@ -90,20 +90,10 @@ rend.glLoadModel("models/delfin.obj",
                  scale=V3(0.1, 0.1, 0.1),
                  rotate=V3(20, 5, 0))
 
-#----------------------STONE------------------------#
-# rend.active_shader = textureBlend
-
-# rend.active_texture = Texture("models/norm.bmp")
-# rend.dirLight = V3(1, 0, 0)
-# rend.glLoadModel("models/Stone_O.obj",
-#                  translate=V3(0.2, -0.5, -0.8),
-#                  scale=V3(1, 1, 1),
-#                  rotate=V3(0, 0, 0))
-
 #----------------------FONDO MARINO------------------------#
 rend.dirLight = V3(0.5, -0.5, 0)
 rend.normal_map = Texture("models/SandStoneNormal.bmp")
-rend.active_texture = Texture("models/SandStone.bmp")
+rend.active_texture = Texture("models/SandStonePainted.bmp")
 rend.active_shader = normalMap
 rend.glLoadModel("models/fondomarino.obj",
                  translate=V3(-4.5, -2.5, -4),

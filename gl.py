@@ -1,6 +1,5 @@
 import struct
 from collections import namedtuple
-import numpy as np
 import glMath
 from math import cos, sin, tan, pi
 
@@ -392,13 +391,16 @@ class Renderer(object):
         maxX = round(max(A.x, B.x, C.x))
         maxY = round(max(A.y, B.y, C.y))
 
-        edge1 = np.subtract(verts[1], verts[0])
-        edge2 = np.subtract(verts[2], verts[0])
+        edge1 = glMath.Substract(verts[1], verts[0])
+        edge2 = glMath.Substract(verts[2], verts[0])
 
         triangleNormal = glMath.Cross(edge1, edge2)
         triangleNormal = glMath.Normalize(triangleNormal)
 
-        deltaUV1 = np.subtract(texCoords[1], texCoords[0])
+        deltaUV1 = glMath.Substract(texCoords[1], texCoords[0])
+        # Cuando uso la función substract de mi libreria, me arroja error de división por 0
+        import numpy as np
+        # Única linea de codigo donde implemento Numpy
         deltaUV2 = np.subtract(texCoords[2], texCoords[0])
         f = 1 / (deltaUV1[0] * deltaUV2[1] - deltaUV2[0] * deltaUV1[1])
 
