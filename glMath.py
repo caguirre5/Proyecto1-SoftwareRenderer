@@ -68,43 +68,37 @@ def HEX(color):
     cr = color/255
     return cr
 
-# Get the transpose matrix
 
-
-def transpose(m):
+def transpuesta(m):
     return list(map(list, zip(*m)))
 
 
-def MMinor(m, i, j):
+def Min(m, i, j):
     return [row[:j] + row[j+1:] for row in (m[:i]+m[i+1:])]
 
-# Fin the determinant of the matrix
 
-
-def getdeterminant(m):
+def determinante(m):
     # Use in 2 x 2 matrix
     if len(m) == 2:
         return m[0][0]*m[1][1]-m[0][1]*m[1][0]
 
     determinant = 0
     for c in range(len(m)):
-        determinant += ((-1)**c)*m[0][c]*getdeterminant(MMinor(m, 0, c))
+        determinant += ((-1)**c)*m[0][c]*determinante(Min(m, 0, c))
     return determinant
-
-# find matrix of cofactors
 
 
 def inv(m):
     cofactors = []
-    determinant = getdeterminant(m)
+    determinant = determinante(m)
 
     for r in range(len(m)):
         cofactorRow = []
         for c in range(len(m)):
-            minor = MMinor(m, r, c)
-            cofactorRow.append(((-1)**(r+c)) * getdeterminant(minor))
+            minor = Min(m, r, c)
+            cofactorRow.append(((-1)**(r+c)) * determinante(minor))
         cofactors.append(cofactorRow)
-    cofactors = transpose(cofactors)
+    cofactors = transpuesta(cofactors)
     for r in range(len(cofactors)):
         for c in range(len(cofactors)):
             cofactors[r][c] = cofactors[r][c]/determinant
